@@ -12,9 +12,10 @@
     - debug:
         msg: "BTCPAY_HOST = {{ lookup('env','BTCPAY_HOST') }}"
 
-    - name: apt-get update with allow-releaseinfo-change
+    - name: apt-get update
       command:
-        cmd: apt-get update --allow-releaseinfo-change
+        cmd: apt-get update
+        # was with --allow-releaseinfo-change
 
   roles:
     - ufw
