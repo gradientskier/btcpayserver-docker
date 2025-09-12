@@ -325,7 +325,7 @@ ansible_install(){
         echo "Okay, Ansible seems to be already installed!"
     fi
 
-    if [[ ! -d /root/.ansible/collections/ansible_collections/community/general ]]
+    if ! ansible-galaxy collection list | grep -q "^community.general";
     then
         echo "Wait, Ansible community.general could not be found, installing..."
         ansible-galaxy collection install community.general
@@ -333,7 +333,7 @@ ansible_install(){
         echo "Okay, Ansible community.general collection seems to be already installed!"
     fi
 
-    if [[ ! -d /root/.ansible/collections/ansible_collections/community/crypto ]]
+    if ! ansible-galaxy collection list | grep -q "^community.crypto";
     then
         echo "Wait, Ansible community.crypto could not be found, installing..."
         ansible-galaxy collection install community.crypto
@@ -341,7 +341,7 @@ ansible_install(){
         echo "Okay, Ansible community.crypto collection seems to be already installed!"
     fi
 
-    if [[ ! -d /root/.ansible/collections/ansible_collections/ansible/posix ]]
+    if ! ansible-galaxy collection list | grep -q "^ansible.posix";
     then
         echo "Wait, Ansible ansible.posix could not be found, installing..."
         ansible-galaxy collection install ansible.posix
