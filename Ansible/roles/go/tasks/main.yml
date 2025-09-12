@@ -1,21 +1,19 @@
-- name: Add an apt key by id from a keyserver
-  apt_key:
-    keyserver: keyserver.ubuntu.com
-    id: F6BC817356A3D45E
+- name: Download golang backports key from ubuntu keyserver
+  ansible.builtin.get_url:
+    url: "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x876B22BA887CA91614B5323FC631127F87FA12D1"
+    dest: "/usr/share/keyrings/simon-eisenmann-golang-backports.asc"
 
-- name: Add golang repository
-  lineinfile:
-    path: /etc/apt/sources.list.d/golang.list
-    regexp: "^deb "
-    line: "deb http://ppa.launchpad.net/longsleep/golang-backports/ubuntu bionic main"
-    create: yes
+- name: Add golang backports repository
+  ansible.builtin.apt_repository:
+    repo: "deb [arch=amd64 signed-by=/usr/share/keyrings/simon-eisenmann-golang-backports.asc] http://ppa.launchpad.net/longsleep/golang-backports/ubuntu bionic main"
+    state: present
 
 - name: apt-get update
   apt:
     update_cache: yes
 
 - name: Install go
-  apt: 
+  apt:
     name: ['golang-{{versions.go}}-go']
     state: latest
 
