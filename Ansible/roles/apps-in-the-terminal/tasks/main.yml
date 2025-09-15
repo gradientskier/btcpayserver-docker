@@ -109,6 +109,11 @@
     cmd: python3 -m venv /root/BTCPayNode/btcpayserver-docker/Tools/python/venv
     creates: "/root/BTCPayNode/btcpayserver-docker/Tools/python/venv/bin/python"
 
+- name: Ensure pip is installed in the virtualenv
+  command:
+    cmd: /root/BTCPayNode/btcpayserver-docker/Tools/python/venv/bin/python -m pip install --upgrade pip
+  changed_when: false
+
 - name: Install lnd_derivation_scheme python dependencies with pip
   pip:
     requirements: /root/BTCPayNode/btcpayserver-docker/Tools/python/requirements.txt
