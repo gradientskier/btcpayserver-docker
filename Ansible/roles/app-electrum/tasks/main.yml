@@ -1,9 +1,9 @@
 - name: Install electrum dependencies
   apt:
     name: [
-      'python3-pyqt5', 'python3-sip', 'python3-setuptools', 'python3-pip',  'python3-venv', 'python3-cryptography', 'python3-dev',
-      '{{apt_libsecp256k1}}',
-      'libusb-1.0-0-dev', 'libudev-dev'
+      'python3-setuptools', 'python3-pip',  'python3-venv', 'python3-dev',
+      'autoconf', 'automake', 'libtool', 'build-essential',
+      'libxcb-cursor-dev','libusb-1.0-0-dev', 'libudev-dev'
     ]
     state: present
 
@@ -30,6 +30,12 @@
     cmd:  python3 -m venv /opt/electrum/venv-{{versions.electrum}}
     creates: "/opt/electrum/venv-{{versions.electrum}}/bin/python"
 
+# The requirements are first taken from the Electrum github repository, at the right tag, example for 4.6.2:
+# https://github.com/spesmilo/electrum/blob/a8b86f2c725ffad4e52d7fa5912906be914f1999/contrib/requirements/requirements.txt
+# https://github.com/spesmilo/electrum/blob/a8b86f2c725ffad4e52d7fa5912906be914f1999/contrib/requirements/requirements-hw.txt
+# https://github.com/spesmilo/electrum/blob/a8b86f2c725ffad4e52d7fa5912906be914f1999/contrib/requirements/requirements-binaries.txt
+
+# And then freezed with:
 # Activate venv with
 # source venv/bin/activate
 # pip install ...
@@ -57,26 +63,6 @@
 - debug:
     msg: "/opt/electrum/venv-{{versions.electrum}}/lib/{{pythonFolder.stdout}}/site-packages/PyQt5"
 
-- name: Create a symbolic link to PyQt5
-  file:
-    src: /usr/lib/python3/dist-packages/PyQt5
-    dest: "/opt/electrum/venv-{{versions.electrum}}/lib/{{pythonFolder.stdout}}/site-packages/PyQt5"
-    state: link
-
-- name: Create a symbolic link to python3-sip
-  file:
-    src: /usr/lib/python3/dist-packages/sip.cpython-39-aarch64-linux-gnu.so
-    dest: "/opt/electrum/venv-{{versions.electrum}}/lib/{{pythonFolder.stdout}}/site-packages/sip.cpython-39-aarch64-linux-gnu.so"
-    state: link
-  when: ansible_architecture == "aarch64"
-
-- name: Create a symbolic link to python3-sip
-  file:
-    src: /usr/lib/python3/dist-packages/sip.cpython-311-x86_64-linux-gnu.so
-    dest: "/opt/electrum/venv-{{versions.electrum}}/lib/{{pythonFolder.stdout}}/site-packages/sip.cpython-311-x86_64-linux-gnu.so"
-    state: link
-  when: ansible_architecture == "x86_64"
-
 # sha256sum Electrum-{{versions.electrum}}.tar.gz
 
 - name: Download electrum
@@ -90,7 +76,8 @@
     name: file:///opt/electrum/Electrum-{{versions.electrum}}.tar.gz
     virtualenv: /opt/electrum/venv-{{versions.electrum}}
 
-# Udev rules
+# Udev rules, implements instructions from:
+# https://github.com/spesmilo/electrum/blob/master/contrib/udev/README.md
 
 - name: Ensure group plugdev exists
   group:
@@ -103,19 +90,25 @@
     groups: plugdev
     append: yes
 
-- name: Copy udev rules file
-  template:
-    src: 20-hw1.rules
-    dest: /etc/udev/rules.d/20-hw1.rules
-    mode: '0644'
+# Udev rules taken from
+# https://github.com/spesmilo/electrum/tree/master/contrib/udev
 
-- name: Execute udevadm trigger
-  shell: udevadm trigger
-  args:
-    executable: /bin/bash
+- name: Copy udev rules files
+  template:
+    src: "{{item}}"
+    dest: /etc/udev/rules.d/{{item}}
+    mode: '0644'
+  with_items:
+    - 20-hw1.rules
+    - 55-usb-jade.rules
 
 - name: Execute udevadm control --reload-rules
   shell: udevadm control --reload-rules
+  args:
+    executable: /bin/bash
+
+- name: Execute udevadm trigger
+  shell: udevadm trigger
   args:
     executable: /bin/bash
 

@@ -9,13 +9,10 @@ paths:
   wireguard_keyfile: /opt/rpi_vault/wireguard_keyfile
 
 versions:
-  electrum: 4.4.6
-  electrum_checksum: sha256:071c42d7154a4e8523801a3898478af537616ddffe7681dc4d326c5c3b5a10b8
+  electrum: 4.6.2
+  electrum_checksum: sha256:66bc3301e78c36bb3a2b32c60e0e68045ec4f8618b60255cccee91d7c4ca46e1
   chantools: v0.9.2
   go: 1.13
-
-# Name of the libsecp256k1 package in apt repositories
-apt_libsecp256k1: "{{ 'libsecp256k1-0' if ansible_architecture == 'aarch64' else 'libsecp256k1-1' if ansible_architecture == 'x86_64' else 'undefined' }}"
 
 # Network interfaces
 interface_docker_bridge: br-btcpayserver
