@@ -1,8 +1,8 @@
-- debug: 
+- debug:
     msg: "mkcert will generate certificates for: {{ mkcert_hostnames }}"
 
 - name: Install wipe and libnss3-tools
-  apt: 
+  apt:
     name: ['wipe', 'libnss3-tools']
     state: present
 
@@ -12,7 +12,6 @@
   file:
     path: "{{mkcert_working_dir}}"
     state: directory
-    mode: '0755'
 
 # Download of mkcert
 # sha256sum /usr/local/bin/mkcert
@@ -34,19 +33,13 @@
 
 # Create the certificate
 
-- name: Recreate mkcert working directory
-  file:
-    path: "{{mkcert_working_dir}}"
-    state: directory
-    mode: '0755'
-
 - name: Remove current mkcert certificate file
-  file: 
+  file:
     path: "{{mkcert_certificate_file}}"
     state: absent
 
 - name: Remove current mkcert key file
-  file: 
+  file:
     path: "{{mkcert_certificate_key_file}}"
     state: absent
 
@@ -85,36 +78,57 @@
     mode: '0751'
 
 - name: "Copy rootCA to {{username}} home folder"
-  copy: 
+  copy:
     remote_src: True
     src: "{{mkcert_rootca}}"
     dest: "/home/{{username}}/mkcert/rootCA.pem"
     owner: "{{username}}"
     group: "{{username}}"
 
-# Creates file in /usr/local/share/ca-certificates
-# Creates symlink in /etc/ssl/certs
-# Remove symlinks with sudo update-ca-certificates -f
+# Default location of the rootCA.pem is in CAROOT, defaulting to ~/.local/share/mkcert
+# rm -rf /home/debian/.local/share/mkcert
+# Creates file in: ll /usr/local/share/ca-certificates
+# Creates symlinks in: ll /etc/ssl/certs | grep mkcert
+# To uninstall:
+# Delete the files with mkcert -uninstall
+# Remove symlinks with: sudo update-ca-certificates -f
+# CAROOT=/home/debian/mkcert; mkcert -uninstall && sudo update-ca-certificates -f
 
-- name: "Install the mkcert certificates for the {{username}} user"
+# Allow debian to run sudo commands without password prompt
+- name: Create sudoers file for the user in sudoers.d
+  copy:
+    dest: "/etc/sudoers.d/{{ username }}"
+    content: "{{ username }} ALL=(ALL) NOPASSWD: ALL\n"
+    mode: 0440
+    validate: 'visudo -cf %s'
+
+# sudo -u debian /bin/bash -c 'export CAROOT=/home/debian/mkcert; mkcert -install'
+- name: "Install the mkcert certificates in the system store for user {{username}}"
   shell: |
     export CAROOT=/home/{{username}}/mkcert
     mkcert -install
   become: Yes
   become_user: "{{username}}"
+  become_method: sudo
   args:
     executable: /bin/bash
+
+# Remove the sudoers file for the user
+- name: Remove sudoers file for the user in sudoers.d
+  file:
+    path: "/etc/sudoers.d/{{ username }}"
+    state: absent
 
 # Copy certificates to btcpayserver nginx
 
 - name: Copy certificate to btcpayserver nginx
-  copy: 
+  copy:
     remote_src: True
     src: "{{mkcert_certificate_file}}"
     dest: "/var/lib/docker/volumes/generated_nginx_certs/_data/default.crt"
 
 - name: Copy certificate key to btcpayserver nginx
-  copy: 
+  copy:
     remote_src: True
     src: "{{mkcert_certificate_key_file}}"
     dest: "/var/lib/docker/volumes/generated_nginx_certs/_data/default.key"

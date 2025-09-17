@@ -1,8 +1,8 @@
 mkcert_hostnames: "{{ lookup('env','BTCPAY_HOST') }} {{ lookup('env','WOOCOMMERCE_HOST') }} pi.hole"
 
-mkcert_working_dir: /opt/mkcert
+mkcert_working_dir: /root/.local/share/mkcert
 
-mkcert_rootca: /opt/mkcert/rootCA.pem
-mkcert_rootca_key: /opt/mkcert/rootCA-key.pem
-mkcert_certificate_file: /opt/mkcert/default.crt
-mkcert_certificate_key_file: /opt/mkcert/default.key
+mkcert_rootca: "{{mkcert_working_dir}}/rootCA.pem"
+mkcert_rootca_key: "{{mkcert_working_dir}}/rootCA-key.pem"
+mkcert_certificate_file: "{{mkcert_working_dir}}/default.crt"
+mkcert_certificate_key_file: "{{mkcert_working_dir}}/default.key"
