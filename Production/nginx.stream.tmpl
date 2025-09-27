@@ -1,0 +1,53 @@
+{{/*
+https://github.com/nginx-proxy/docker-gen/blob/main/templates/etcd.tmpl
+https://github.com/nginx-proxy/docker-gen
+*/}}
+
+{{/* The certs folder needs to be mounted, as it is not mounted when nginx-https is not present. */}}
+{{ if exists "/etc/nginx/certs" }}
+
+  {{ $cert := "default" }}
+
+  {{ range $host, $containers := groupByMulti $ "Env.VIRTUAL_HOST" "," }}
+  {{ $host := trim $host }}
+
+	{{/* Get the best matching cert  by name for the vhost. */}}
+	{{ $vhostCert := (closest (dir "/etc/nginx/certs") (printf "%s.crt" $host))}}
+
+	{{/* vhostCert is actually a filename so remove any suffixes since they are added later */}}
+	{{ $vhostCert := trimSuffix ".crt" $vhostCert }}
+	{{ $vhostCert := trimSuffix ".key" $vhostCert }}
+
+	{{/* Use the the best vhost match or fallback to default */}}
+  {{ $cert = (ternary "default" $vhostCert (empty $vhostCert) )}}
+  {{ end }}
+{{/*Iterate over all containers*/}}
+
+{{range $key, $value := .}}
+  {{ $serviceName := (index $value.Labels "com.docker.compose.service") }}
+  {{ if (eq $serviceName "electrs") }}
+upstream electrs {
+  server electrs:50001;
+}
+
+server {
+  listen 50002 ssl;
+  proxy_pass electrs;
+
+  ssl_certificate /etc/nginx/certs/{{ (printf "%s.crt" $cert) }};
+  ssl_certificate_key /etc/nginx/certs/{{ (printf "%s.key" $cert) }};
+
+{{ if (exists (printf "/etc/nginx/certs/%s.dhparam.pem" $cert)) }}
+  ssl_dhparam {{ printf "/etc/nginx/certs/%s.dhparam.pem" $cert }};
+{{ end }}
+
+  ssl_session_cache shared:SSLSTREAM:1m;
+  ssl_session_timeout 4h;
+  ssl_protocols TLSv1 TLSv1.1 TLSv1.2 TLSv1.3;
+  ssl_prefer_server_ciphers on;
+}
+  {{ end }}
+{{ end }}
+
+{{/*else*/}}
+{{ end }}

@@ -38,6 +38,7 @@ docker run -v "$(pwd)/Generated:/app/Generated" \
 
 if [ "$BTCPAYGEN_REVERSEPROXY" == "nginx" ]; then
     cp Production/nginx.tmpl Generated/nginx.tmpl
+    cp Production/nginx.stream.tmpl Generated/nginx.stream.tmpl
 fi
 
 [[ -f "Generated/pull-images.sh" ]] && chmod +x Generated/pull-images.sh
@@ -62,12 +63,12 @@ if [[ $BTCPAYGEN_ADDITIONAL_FRAGMENTS = *opt-add-guacamole* ]]; then
     echo "Guacamole recreate configuration files with a new password"
     mkdir -p Generated/guacamole
     cp Production/guacamole/user-mapping.xml Generated/guacamole/user-mapping.xml
-    
+
     # Setup a random guacamole password
     GUACAMOLE_PASSWORD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
     sed -i 's/password="PASSWORD"/password="'$GUACAMOLE_PASSWORD'"/' Generated/guacamole/user-mapping.xml
     sed -i 's/username=USERNAME&password=PASSWORD/username=USERNAME\&password='$GUACAMOLE_PASSWORD'/' Generated/docker-compose.generated.yml
-    
+
     # Always stop guacamole container upon configuration file change, otherwise changes are not read
     docker stop --time 1 generated_guacamole_1 || true
   else

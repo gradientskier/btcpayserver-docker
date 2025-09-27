@@ -1,0 +1,10 @@
+version: "3"
+
+services:
+  nginx:
+    ports:
+      - "50002:50002"
+
+requires:
+  - opt-add-electrs
+  # either nginx-https or nginx-https-dns-challenge is also required, but requires does not handle alternatives

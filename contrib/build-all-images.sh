@@ -1279,3 +1279,14 @@ git checkout v0.10.10
 cd "$(dirname $DOCKERFILE)"
 docker build -f "$DOCKERFILE" -t gradientskier/electrs:v0.10.10 .
 cd - && cd ..
+
+# Build nginx-stream
+# https://github.com/gradientskier/nginx-stream/blob/master/Dockerfile
+DOCKERFILE="Dockerfile"
+echo "Building gradientskier/nginx-stream:v1.26.3-3-deb13u1"
+git clone https://github.com/gradientskier/nginx-stream.git
+cd nginx-stream
+git checkout v1.26.3-3-deb13u1
+cd "$(dirname $DOCKERFILE)"
+docker build -f "$DOCKERFILE" -t gradientskier/nginx-stream:v1.26.3-3-deb13u1 .
+cd - && cd ..

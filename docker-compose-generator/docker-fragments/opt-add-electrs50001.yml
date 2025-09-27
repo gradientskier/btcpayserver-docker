@@ -1,0 +1,9 @@
+version: "3"
+
+services:
+  electrs:
+    ports:
+      - "50001:50001"
+
+requires:
+  - opt-add-electrs

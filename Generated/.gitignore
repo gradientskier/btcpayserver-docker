@@ -1,5 +1,6 @@
 *.yml
 nginx.tmpl
+nginx.stream.tmpl
 *.json
 pull-images.sh
 

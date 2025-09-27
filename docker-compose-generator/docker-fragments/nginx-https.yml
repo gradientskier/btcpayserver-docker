@@ -27,5 +27,10 @@ services:
   nginx-gen:
     volumes:
       - "nginx_certs:/etc/nginx/certs:ro"
+
+  nginx-stream-gen:
+    volumes:
+      - "nginx_certs:/etc/nginx/certs:ro"
+
 volumes:
   acme:
