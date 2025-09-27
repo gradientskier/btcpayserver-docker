@@ -85,6 +85,32 @@
     owner: "{{username}}"
     group: "{{username}}"
 
+- name: "Copy default.crt to {{username}} home folder"
+  copy:
+    remote_src: True
+    src: "{{mkcert_certificate_file}}"
+    dest: "/home/{{username}}/mkcert/default.crt"
+    owner: "{{username}}"
+    group: "{{username}}"
+
+# Motivation for copying the fullchain.pem
+# Electrum wants the fullchain to be copied to the .electrum/certs folder with name equal to the IP address.
+# Conversely, Sparrow is fine with the certificate. The first time it connects, it copies automatically the certificate to the .sparrow/certs folder and warns about subsequent changes to the certificate.
+
+- name: Concatenate default.crt and rootCA.pem to fullchain.pem
+  shell: cat default.crt rootCA.pem > fullchain.pem
+  args:
+    chdir: "{{mkcert_working_dir}}"
+    executable: /bin/bash
+
+- name: "Copy fullchain.pem to {{username}} home folder"
+  copy:
+    remote_src: True
+    src: "{{mkcert_fullchain_file}}"
+    dest: "/home/{{username}}/mkcert/fullchain.pem"
+    owner: "{{username}}"
+    group: "{{username}}"
+
 # Default location of the rootCA.pem is in CAROOT, defaulting to ~/.local/share/mkcert
 # rm -rf /home/debian/.local/share/mkcert
 # Creates file in: ll /usr/local/share/ca-certificates
