@@ -9,14 +9,16 @@ services:
     environment:
       BITCOIN_EXTRA_ARGS: |
         rpcauth=electrs:29b2fae539626e8bac1a1486de38164e$$32e907cec3853446590f0f5e794b3473640250c155d76bcbf0339a904f0b1cbf
+
   electrs:
     image: gradientskier/electrs:v0.10.10
+    container_name: electrs
     entrypoint: electrs --log-filters=INFO --index-batch-size=10 --db-dir /home/user/db
     restart: unless-stopped
     healthcheck:
       disable: true
-    ports:
-      - "127.0.0.1:50001:50001"
+    expose:
+      - "50001"
     volumes:
       - "bitcoin_datadir:/root/.bitcoin:ro"
       - "electrs_datadir:/home/user"
@@ -28,6 +30,10 @@ services:
       ELECTRS_ELECTRUM_RPC_ADDR: 0.0.0.0:50001
     depends_on:
       - bitcoind
+
+  nginx:
+    ports:
+      - "50002:50002"
 
 volumes:
   electrs_datadir:

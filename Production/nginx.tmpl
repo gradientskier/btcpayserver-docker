@@ -335,7 +335,7 @@ map $http_upgrade $proxy_connection {
 server_names_hash_bucket_size 128;
 
 # Prevent Nginx Information Disclosure
-server_tokens off;
+# server_tokens off;
 
 # Default dhparam
 {{ if (exists "/etc/nginx/dhparam/dhparam.pem") }}
@@ -348,7 +348,7 @@ map $scheme $proxy_x_forwarded_ssl {
   https on;
 }
 
-gzip on;
+# gzip on;
 gzip_min_length 1000;
 gzip_types image/svg+xml text/plain text/css application/javascript application/json application/x-javascript text/xml application/xml application/xml+rss text/javascript;
 

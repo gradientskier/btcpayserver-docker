@@ -1,0 +1,25 @@
+{{/*
+https://github.com/nginx-proxy/docker-gen/blob/main/templates/etcd.tmpl
+https://github.com/nginx-proxy/docker-gen
+*/}}
+
+{{range $key, $value := .}}
+  {{ $serviceName := (index $value.Labels "com.docker.compose.service") }}
+  {{ if (eq $serviceName "electrs") }}
+upstream electrs {
+  server electrs:50001;
+}
+
+server {
+  listen 50002 ssl;
+  proxy_pass electrs;
+
+  ssl_certificate /etc/nginx/certs/default.crt;
+  ssl_certificate_key /etc/nginx/certs/default.key;
+  ssl_session_cache shared:SSL:1m;
+  ssl_session_timeout 4h;
+  ssl_protocols TLSv1 TLSv1.1 TLSv1.2 TLSv1.3;
+  ssl_prefer_server_ciphers on;
+}
+  {{ end }}
+{{ end }}
