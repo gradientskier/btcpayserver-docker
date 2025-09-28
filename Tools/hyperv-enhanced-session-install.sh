@@ -109,4 +109,4 @@ systemctl start xrdp
 ###############################################################################
 
 echo "Install is complete."
-echo "Please turn off your VM Machine and execute 'Set-VM \"Debian\" -EnhancedSessionTransportType HvSocket' in PowerShell Admin and turn on again your VM Machine"
+echo "Please turn off your VM Machine and execute 'Set-VM btcpaydev -EnhancedSessionTransportType HvSocket' in PowerShell Admin and turn on again your VM Machine"
