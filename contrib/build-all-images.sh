@@ -645,7 +645,7 @@ DOCKERFILE="Dockerfile"
 echo "Building fireflyiii/core:latest"
 git clone https://dev.azure.com/Firefly-III/_git/MainImage core
 cd core
-git checkout 
+git checkout
 cd "$(dirname $DOCKERFILE)"
 docker build -f "$DOCKERFILE" -t "fireflyiii/core:latest" .
 cd - && cd ..
@@ -1190,4 +1190,13 @@ cd "$(dirname $DOCKERFILE)"
 docker build -f "$DOCKERFILE" -t "romanornr/docker-viacoin:0.15.2" .
 cd - && cd ..
 
-
+# Build electrs
+# https://raw.githubusercontent.com/romanz/electrs/refs/heads/master/Dockerfile
+DOCKERFILE="Dockerfile"
+echo "Building romanz/electrs:v0.10.10"
+git clone https://github.com/romanz/electrs.git
+cd electrs
+git checkout v0.10.10
+cd "$(dirname $DOCKERFILE)"
+docker build -f "$DOCKERFILE" -t gradientskier/electrs:v0.10.10 .
+cd - && cd ..
