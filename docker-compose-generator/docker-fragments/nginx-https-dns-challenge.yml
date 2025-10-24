@@ -1,0 +1,53 @@
+version: '3'
+
+# Documentation available at:
+# https://github.com/nginx-proxy/acme-companion/blob/main/docs/Let's-Encrypt-and-ACME.md#dns-01-acme-challenge
+
+services:
+  letsencrypt-nginx-proxy-companion-dns:
+    image: nginxproxy/acme-companion:2.6.1
+    container_name: letsencrypt-nginx-proxy-companion
+    restart: unless-stopped
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "nginx_certs:/etc/nginx/certs:rw"
+      - "acme:/etc/acme.sh"
+    environment:
+      # Enable for debugging DNS challenge issues
+      # DEBUG: true
+      NGINX_DOCKER_GEN_CONTAINER: "nginx-gen"
+      NGINX_PROXY_CONTAINER: "nginx"
+      LETSENCRYPT_RESTART_CONTAINER: true
+      # Let's encrypt email address is needed for nginxproxy/acme-companion:2.6.1 otherwise account registration fails.
+      LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL:?Please specify LETSENCRYPT_EMAIL environment variable, required by DNS challenge.}
+      ACME_CHALLENGE: DNS-01
+      # The ACME_CA_URI variable for nginxproxy/acme-companion:2.6.1 must be a full URL or empty for defaulting to production.
+      ACME_CA_URI: https://acme-v02.api.letsencrypt.org/directory
+      # ACME_CA_URI: https://acme-staging-v02.api.letsencrypt.org/directory
+      ACMESH_DNS_API_CONFIG: |-
+        DNS_API: dns_cf
+        CF_Token: ${CLOUDFLARE_DNS_TOKEN:?Please specify CLOUDFLARE_DNS_TOKEN environment variable}
+        CF_Account_ID: ${CLOUDFLARE_DNS_ACCOUNT_ID:?Please specify CLOUDFLARE_DNS_ACCOUNT_ID environment variable}
+        CF_Zone_ID: ${CLOUDFLARE_DNS_ZONE_ID:?Please specify CLOUDFLARE_DNS_ZONE_ID environment variable}
+    links:
+      - nginx-gen
+
+  nginx:
+    ports:
+      - "${REVERSEPROXY_HTTPS_PORT:-443}:443"
+    volumes:
+      - "nginx_certs:/etc/nginx/certs:ro"
+
+  nginx-gen:
+    volumes:
+      - "nginx_certs:/etc/nginx/certs:ro"
+
+  nginx-stream-gen:
+    volumes:
+      - "nginx_certs:/etc/nginx/certs:ro"
+
+volumes:
+  acme:
+
+incompatible:
+  - nginx-https

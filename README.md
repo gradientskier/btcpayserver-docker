@@ -128,6 +128,7 @@ Additionally, there are specific environment variables for some addons:
 * `LND_WTCLIENT_SWEEP_FEE`: If LND watchtower is activated with [opt-lnd-wtclient](docker-compose-generator/docker-fragments/opt-lnd-wtclient.yml), you can use `LND_WTCLIENT_SWEEP_FEE` to change the sweep fee used in constructing the justice transaction (default is 10 sat/byte)
 * `FIREFLY_HOST`: If fireflyiii is activated with [opt-add-fireflyiii](docker-compose-generator/docker-fragments/opt-add-fireflyiii.yml), the hostname of your fireflyiii website (eg. `firefly.example.com`)
 * `CLOUDFLARE_TUNNEL_TOKEN`: Used to expose your instance to clearnet with a Cloudflare Argo Tunnel (if cloudflare tunnel is activated with [opt-add-cloudflared](docker-compose-generator/docker-fragments/opt-add-cloudflared.yml), for setup instructions [see documentation](docs/cloudflare-tunnel.md))
+* `CLOUDFLARE_DNS_TOKEN`, `CLOUDFLARE_DNS_ACCOUNT_ID` and `CLOUDFLARE_DNS_ZONE_ID` activated with [nginx-https-dns-challenge](docker-compose-generator/docker-fragments/nginx-https-dns-challenge.yml). See the documentation at [acme-companion](https://github.com/nginx-proxy/acme-companion/blob/main/docs/Let's-Encrypt-and-ACME.md#dns-01-acme-challenge). See how to [create token](https://developers.cloudflare.com/fundamentals/api/get-started/create-token) and [find account and zone ids](https://developers.cloudflare.com/fundamentals/account/find-account-and-zone-ids) on Cloudflare DNS.
 
 # Tooling
 

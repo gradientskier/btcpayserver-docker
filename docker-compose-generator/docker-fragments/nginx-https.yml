@@ -34,3 +34,6 @@ services:
 
 volumes:
   acme:
+
+incompatible:
+  - nginx-https-dns-challenge

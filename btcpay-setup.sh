@@ -114,6 +114,9 @@ Add-on specific variables:
     CHATWOOT_HOST: If chatwoot is activated with opt-add-chatwoot, the hostname of your chatwoot website (eg. store.example.com)
     FIREFLY_HOST: If fireflyiii is activated with opt-add-fireflyiii, the hostname of your libre patron website (eg. firefly.example.com)
     CLOUDFLARE_TUNNEL_TOKEN: Used to expose your instance to clearnet with a Cloudflare Argo Tunnel
+    CLOUDFLARE_DNS_TOKEN: API token for Cloudflare DNS challenge
+    CLOUDFLARE_DNS_ACCOUNT_ID: Cloudflare DNS account ID
+    CLOUDFLARE_DNS_ZONE_ID: Cloudflare DNS zone ID
 END
 }
 START=""
@@ -215,6 +218,9 @@ fi
 : "${BTCPAY_ENABLE_SSH:=false}"
 : "${PIHOLE_SERVERIP:=}"
 : "${CLOUDFLARE_TUNNEL_TOKEN:=}"
+: "${CLOUDFLARE_DNS_TOKEN:=}"
+: "${CLOUDFLARE_DNS_ACCOUNT_ID:=}"
+: "${CLOUDFLARE_DNS_ZONE_ID:=}"
 
 OLD_BTCPAY_DOCKER_COMPOSE="$BTCPAY_DOCKER_COMPOSE"
 ORIGINAL_DIRECTORY="$(pwd)"
